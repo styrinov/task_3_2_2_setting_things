@@ -21,6 +21,11 @@ jobs:
       with:
         terraform_version: latest
 
+    - name: Download tfstate
+      uses: actions/download-artifact@v3
+      with:
+        name: terraform-state    
+
     - name: Terraform Init
       run: terraform init
 
