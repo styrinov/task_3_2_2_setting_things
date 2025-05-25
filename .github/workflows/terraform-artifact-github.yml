@@ -1,0 +1,59 @@
+name: Terraform_GitHub_Artifacts
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Terraform Action"
+        required: true
+        default: "apply"
+        type: choice
+        options:
+          - apply
+          - destroy
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Download tfstate if exists
+        if: github.event.inputs.action == 'destroy'
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-state
+
+      - name: Terraform Plan
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: github.event.inputs.action == 'apply'
+        run: terraform apply -auto-approve -input=false
+
+      - name: Upload tfstate
+        if: github.event.inputs.action == 'apply'
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-state
+          path: terraform.tfstate
+
+      - name: Terraform Destroy
+        if: github.event.inputs.action == 'destroy'
+        run: terraform destroy -auto-approve -input=false
