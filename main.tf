@@ -8,11 +8,11 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket = "0b9ec6a0-4338-4faf-b5d3-ae79aedd8089-terraform-state-bucket"
-    key    = "vpc/test/terraform.tfstate"
-    region = "eu-north-1"
-  }
+#   backend "s3" {
+#     bucket = "0b9ec6a0-4338-4faf-b5d3-ae79aedd8089-terraform-state-bucket"
+#     key    = "vpc/test/terraform.tfstate"
+#     region = "eu-north-1"
+#   }
 }
 
 provider "aws" {
